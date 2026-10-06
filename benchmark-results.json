@@ -1,0 +1,16 @@
+{
+  "schema_version": "2.0",
+  "note": "Live benchmark sessions are recorded in Room (`benchmark_sessions` table) using real Choreographer FrameCallback microsecond deltas, PowerManager thermal status, BatteryManager temperature, and CPU frequency sampling, and can be exported directly from the Benchmarks tab.",
+  "metrics_captured": [
+    "avgFps",
+    "p50FrameTimeMs",
+    "p90FrameTimeMs",
+    "p95FrameTimeMs",
+    "p99FrameTimeMs",
+    "frameStabilityPercent",
+    "startTempCelsius",
+    "endTempCelsius",
+    "thermalThrottleEvents",
+    "confidenceLevel"
+  ]
+}

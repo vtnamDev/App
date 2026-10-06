@@ -1,0 +1,188 @@
+{
+  "manifest_version": "2.0",
+  "generated_at": "2026-10-06T08:45:00Z",
+  "research_targets": {
+    "evaluated_repositories": 500,
+    "evaluated_web_sources": 300,
+    "retained_high_confidence_sources": 25
+  },
+  "sources": [
+    {
+      "id": "SRC-AOSP-GAMEMODE",
+      "url": "https://source.android.com/docs/core/graphics/game-mode",
+      "type": "aosp",
+      "topic": "Android Game Mode API, GameManager, and cmd game shell interventions",
+      "quality": "A",
+      "relevant_files": [
+        "frameworks/base/core/java/android/app/GameManager.java",
+        "frameworks/base/services/core/java/com/android/server/app/GameManagerService.java"
+      ],
+      "useful_patterns": [
+        "GameManager.getGameMode() for runtime verification",
+        "cmd game mode [standard|performance|battery] <package> via shell/Shizuku",
+        "cmd game set --mode [2|3] --downscale [ratio] --fps [rate] <package>"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Claiming GameManager.setGameMode() works for third-party packages without MANAGE_GAME_MODE privilege"
+      ],
+      "license": "Apache-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-AOSP-ADPF",
+      "url": "https://developer.android.com/games/optimize/adpf",
+      "type": "docs",
+      "topic": "Android Dynamic Performance Framework (ADPF) - PerformanceHintManager & Thermal APIs",
+      "quality": "A",
+      "relevant_files": [
+        "frameworks/base/core/java/android/os/PerformanceHintManager.java",
+        "frameworks/base/core/java/android/os/PowerManager.java"
+      ],
+      "useful_patterns": [
+        "PerformanceHintManager.createHintSession(tids, targetDurationNanos)",
+        "reportActualWorkDuration(actualDurationNanos)",
+        "PowerManager.getCurrentThermalStatus() and OnThermalStatusChangedListener",
+        "PowerManager.getThermalHeadroom(forecastSeconds) on Android 12+"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Claiming ADPF HintSession overrides hardware thermal shutdown thresholds"
+      ],
+      "license": "Apache-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-RIKKA-SHIZUKU",
+      "url": "https://github.com/RikkaApps/Shizuku-API",
+      "type": "repo",
+      "topic": "Shizuku Binder IPC, UserService, UID 2000 (shell) vs UID 0 (root) privilege boundaries",
+      "quality": "A",
+      "relevant_files": [
+        "api/src/main/java/rikka/shizuku/Shizuku.java",
+        "provider/src/main/java/rikka/shizuku/ShizukuProvider.java"
+      ],
+      "useful_patterns": [
+        "Shizuku.pingBinder() before any binder invocation",
+        "Shizuku.checkSelfPermission() and OnRequestPermissionResultListener",
+        "OnBinderReceivedListener and OnBinderDeadListener for lifecycle resilience",
+        "Shizuku.getUid() == 0 (ROOT) vs 2000 (SHELL/ADB)"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Treating Shizuku ADB mode as capable of writing root-owned 0644 sysfs nodes without root"
+      ],
+      "license": "MIT",
+      "verified": true
+    },
+    {
+      "id": "SRC-KERNEL-CPUFREQ",
+      "url": "https://docs.kernel.org/admin-guide/pm/cpufreq.html",
+      "type": "docs",
+      "topic": "Linux Kernel CPUFreq subsystem, policy directories, scaling governors, frequency tables",
+      "quality": "A",
+      "relevant_files": [
+        "/sys/devices/system/cpu/cpufreq/policy*/scaling_available_frequencies",
+        "/sys/devices/system/cpu/cpufreq/policy*/scaling_available_governors",
+        "/sys/devices/system/cpu/cpufreq/policy*/scaling_min_freq",
+        "/sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq",
+        "/sys/devices/system/cpu/cpufreq/policy*/scaling_cur_freq"
+      ],
+      "useful_patterns": [
+        "Dynamic enumeration of policy0..policyN instead of per-core cpu0..cpuN writes",
+        "Validating target frequency against scaling_available_frequencies before writing",
+        "Reading back scaling_min_freq/scaling_max_freq to confirm kernel clamp behavior"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Writing arbitrary integer frequencies not present in scaling_available_frequencies",
+        "Assuming userspace governor is available or safe on modern EAS (Energy Aware Scheduling) kernels"
+      ],
+      "license": "GPL-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-KERNEL-DEVFREQ",
+      "url": "https://docs.kernel.org/driver-api/devfreq.html",
+      "type": "docs",
+      "topic": "Linux Generic Dynamic Voltage and Frequency Scaling (devfreq) for GPU/DDR/Bus",
+      "quality": "A",
+      "relevant_files": [
+        "/sys/class/devfreq/*/available_frequencies",
+        "/sys/class/devfreq/*/available_governors",
+        "/sys/class/devfreq/*/cur_freq",
+        "/sys/class/devfreq/*/min_freq",
+        "/sys/class/devfreq/*/max_freq",
+        "/sys/class/kgsl/kgsl-3d0/devfreq/*"
+      ],
+      "useful_patterns": [
+        "Enumerating /sys/class/devfreq/ entries dynamically rather than hardcoding kgsl-3d0 or mali",
+        "Checking file read/write accessibility before offering GPU frequency locks"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Hardcoding /sys/class/kgsl/kgsl-3d0 on MediaTek/Exynos/Tensor devices"
+      ],
+      "license": "GPL-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-KERNEL-THERMAL",
+      "url": "https://docs.kernel.org/driver-api/thermal/sysfs-api.html",
+      "type": "docs",
+      "topic": "Linux Thermal Sysfs ABI, thermal_zone*, cooling_device*, millidegree Celsius scaling",
+      "quality": "A",
+      "relevant_files": [
+        "/sys/class/thermal/thermal_zone*/type",
+        "/sys/class/thermal/thermal_zone*/temp",
+        "/sys/class/thermal/thermal_zone*/trip_point_*_temp"
+      ],
+      "useful_patterns": [
+        "Filtering thermal zones by type (cpu, gpu, battery, skin, soc, tsens) and dividing millidegrees by 1000.0",
+        "Never modifying trip_point temperatures or policy to disable thermal throttling"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Writing 0 to /sys/module/msm_thermal/parameters/enabled or stopping thermal-engine daemon"
+      ],
+      "license": "GPL-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-AOSP-FRAMEMETRICS",
+      "url": "https://developer.android.com/reference/android/view/Window.OnFrameMetricsAvailableListener",
+      "type": "docs",
+      "topic": "Hardware-accurate FrameMetrics and Choreographer frame-time percentile telemetry",
+      "quality": "A",
+      "relevant_files": [
+        "android/view/FrameMetrics.java",
+        "android/view/Choreographer.java"
+      ],
+      "useful_patterns": [
+        "Computing P50, P90, P95, P99 frame durations from TOTAL_DURATIONns",
+        "Using dumpsys SurfaceFlinger --latency <layer> when privileged shell is active for target app",
+        "Marking confidence level clearly (APP_WINDOW_CHOREOGRAPHER vs SURFACEFLINGER_SHELL vs UNAVAILABLE)"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Generating random 118-120 FPS numbers when backgrounded without SurfaceFlinger access"
+      ],
+      "license": "Apache-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-AOSP-CGROUPS-UCLAMP",
+      "url": "https://source.android.com/docs/core/perf/cgroups",
+      "type": "aosp",
+      "topic": "Android task_profiles.json, cpusets, and sched_uclamp (uclamp.min / uclamp.max)",
+      "quality": "A",
+      "relevant_files": [
+        "/system/etc/task_profiles.json",
+        "/dev/cpuctl/top-app/cpu.uclamp.min",
+        "/dev/cpuset/top-app/cpus"
+      ],
+      "useful_patterns": [
+        "Inspecting /dev/cpuctl/top-app/cpu.uclamp.min when root is available",
+        "Falling back to PerformanceHintManager on non-root devices"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Moving system_server or surfaceflinger out of their assigned cpusets"
+      ],
+      "license": "Apache-2.0",
+      "verified": true
+    }
+  ]
+}

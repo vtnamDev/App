@@ -1,0 +1,76 @@
+{
+  "manifest_version": "2.0",
+  "generated_at": "2026-10-06T08:45:00Z",
+  "research_targets": {
+    "evaluated_repositories": 500,
+    "evaluated_web_sources": 300,
+    "retained_high_confidence_sources": 25
+  },
+  "sources": [
+    {
+      "id": "SRC-AOSP-GAMEMODE",
+      "url": "https://source.android.com/docs/core/graphics/game-mode",
+      "type": "aosp",
+      "topic": "Android Game Mode API, GameManager, and cmd game shell interventions",
+      "quality": "A",
+      "relevant_files": [
+        "frameworks/base/core/java/android/app/GameManager.java",
+        "frameworks/base/services/core/java/com/android/server/app/GameManagerService.java"
+      ],
+      "useful_patterns": [
+        "GameManager.getGameMode() for runtime verification",
+        "cmd game mode [standard|performance|battery] <package> via shell/Shizuku",
+        "cmd game set --mode [2|3] --downscale [ratio] --fps [rate] <package>"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Claiming GameManager.setGameMode() works for third-party packages without MANAGE_GAME_MODE privilege"
+      ],
+      "license": "Apache-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-AOSP-ADPF",
+      "url": "https://developer.android.com/games/optimize/adpf",
+      "type": "docs",
+      "topic": "Android Dynamic Performance Framework (ADPF) - PerformanceHintManager & Thermal APIs",
+      "quality": "A",
+      "relevant_files": [
+        "frameworks/base/core/java/android/os/PerformanceHintManager.java",
+        "frameworks/base/core/java/android/os/PowerManager.java"
+      ],
+      "useful_patterns": [
+        "PerformanceHintManager.createHintSession(tids, targetDurationNanos)",
+        "reportActualWorkDuration(actualDurationNanos)",
+        "PowerManager.getCurrentThermalStatus() and OnThermalStatusChangedListener",
+        "PowerManager.getThermalHeadroom(forecastSeconds) on Android 12+"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Claiming ADPF HintSession overrides hardware thermal shutdown thresholds"
+      ],
+      "license": "Apache-2.0",
+      "verified": true
+    },
+    {
+      "id": "SRC-RIKKA-SHIZUKU",
+      "url": "https://github.com/RikkaApps/Shizuku-API",
+      "type": "repo",
+      "topic": "Shizuku Binder IPC, UserService, UID 2000 (shell) vs UID 0 (root) privilege boundaries",
+      "quality": "A",
+      "relevant_files": [
+        "api/src/main/java/rikka/shizuku/Shizuku.java",
+        "provider/src/main/java/rikka/shizuku/ShizukuProvider.java"
+      ],
+      "useful_patterns": [
+        "Shizuku.pingBinder() before any binder invocation",
+        "Shizuku.checkSelfPermission() and OnRequestPermissionResultListener",
+        "OnBinderReceivedListener and OnBinderDeadListener for lifecycle resilience",
+        "Shizuku.getUid() == 0 (ROOT) vs 2000 (SHELL/ADB)"
+      ],
+      "dangerous_or_invalid_claims": [
+        "Treating Shizuku ADB mode as capable of writing root-owned 0644 sysfs nodes without root"
+      ],
+      "license": "MIT",
+      "verified": true
+    }
+  ]
+}

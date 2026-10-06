@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Nexus Boost</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_capabilities">Capabilities</string>
+    <string name="nav_tuning">Tuning</string>
+    <string name="nav_games">Games</string>
+    <string name="nav_benchmarks">Benchmarks</string>
+    <string name="nav_ai_advisor">AI Advisor</string>
+    <string name="nav_audit_logs">Audit &amp; Safety</string>
+    <string name="status_ready">READY</string>
+    <string name="status_boosting">BOOSTING</string>
+    <string name="status_active">ACTIVE</string>
+    <string name="status_limited">LIMITED</string>
+    <string name="status_failed">FAILED</string>
+    <string name="status_restoring">RESTORING</string>
+    <string name="action_engage_boost">ENGAGE PERFORMANCE PROFILE</string>
+    <string name="action_restore_baseline">RESTORE HARDWARE BASELINE</string>
+    <string name="security_prototype_warning">Security Warning: API keys included in BuildConfig for this prototype can be extracted from decompiled APKs. Do not share this APK publicly.</string>
+</resources>

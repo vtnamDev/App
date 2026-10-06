@@ -1,0 +1,6 @@
+{
+  "name": "Nexus Boost",
+  "description": "Production Android performance-control, Shizuku capability orchestration, hardware telemetry, and AI diagnostics platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

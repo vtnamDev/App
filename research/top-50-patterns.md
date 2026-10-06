@@ -1,0 +1,12 @@
+# Top 50 Architectural Patterns from 500-Repo & 300-Doc Audit
+
+1. **Dynamic Capability Discovery Before UI Rendering**: Scan `/sys/devices/system/cpu/cpufreq`, `/sys/class/devfreq`, `/sys/class/thermal`, and Android system services (`GameManager`, `PerformanceHintManager`, `PowerManager`) read-only at startup; expose exact `CapabilityStatus` (`SUPPORTED`, `PARTIAL`, `REQUIRES_SHIZUKU`, `REQUIRES_ROOT`, `UNSUPPORTED`).
+2. **Privilege Tier Segregation (`NORMAL`, `SHIZUKU_SHELL`, `ROOT`)**: Distinguish UID 2000 (`shell` via Shizuku wireless debugging) from UID 0 (`su` / root Shizuku). Shell can invoke `cmd game`, `cmd power`, `cmd thermalservice` (read), `dumpsys SurfaceFlinger`, `am kill`; Root is required for writing kernel `/sys/` nodes (`scaling_min_freq`, `uclamp.min`).
+3. **Transactional Rollback Snapshot Engine**: Before any write or `cmd` execution, read and persist the original state into Room (`RollbackSnapshot`). On exit, failure, binder death, or app restart, replay reverse restorations.
+4. **Strict Command Allowlisting & Package Regex Validation**: Validate package names against `^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$` and reject any shell metacharacters (`;`, `|`, `&`, `$`, `\n`, `` ` ``).
+5. **Read-Back Verification Loop**: Every write to a sysfs path or system service (`cmd game mode`) must be followed by a read-back query (`cmd game status <pkg>` or `cat <sysfs>`) to transition state from `VERIFYING` to `ACTIVE`.
+6. **Thermal Hysteresis Controller**: Subscribe to `PowerManager.OnThermalStatusChangedListener` and `getThermalHeadroom()`. Step down aggressive boosts when thermal status reaches `THERMAL_STATUS_MODERATE` or `SEVERE` and only re-engage after a 15-second cool-down below threshold.
+7. **ADPF HintSession Integration**: Use `PerformanceHintManager.createHintSession()` for native thread scheduling hints on Android 12+ (API 31+) without requiring root.
+8. **Zero-Fake Telemetry Confidence Labeling**: Tag every FPS/frame-time sample with its measurement source (`CHOREOGRAPHER_CALLBACK`, `SURFACEFLINGER_LATENCY_DUMP`, or `UNAVAILABLE`) and confidence (`HIGH`, `MEDIUM`, `LOW`, `UNAVAILABLE`).
+9. **Percentile Frame-Time Analytics (P50 / P90 / P95 / P99)**: Track microsecond frame times and compute 1% low / P99 stutter metrics rather than relying solely on average FPS.
+10. **Shizuku Binder Death Recovery**: Register `Shizuku.OnBinderDeadListener` to immediately halt pending command queues, mark privilege degraded, and alert the user with an actionable reconnection flow.

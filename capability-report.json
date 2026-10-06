@@ -1,0 +1,47 @@
+{
+  "report_version": "2.0",
+  "dynamic_runtime_scan": true,
+  "note": "Nexus Boost generates live capability reports at runtime from actual device hardware and exports them to JSON/Markdown. This file documents the baseline schema.",
+  "capabilities": [
+    {
+      "id": "adpf_performance_hint",
+      "name": "Android Dynamic Performance Framework (ADPF)",
+      "layer": "Android Framework",
+      "required_privilege": "NORMAL",
+      "detection_method": "PerformanceHintManager.preferredUpdateRateNanos",
+      "fallback_when_unsupported": "Graceful fallback to standard thread priority"
+    },
+    {
+      "id": "power_thermal_api",
+      "name": "PowerManager Thermal Status & Headroom API",
+      "layer": "Android Framework",
+      "required_privilege": "NORMAL",
+      "detection_method": "PowerManager.getCurrentThermalStatus() & getThermalHeadroom(10)",
+      "fallback_when_unsupported": "BatteryManager sticky intent temperature sensor"
+    },
+    {
+      "id": "android_game_mode",
+      "name": "Android GameManager & Shell Interventions",
+      "layer": "System Service (game)",
+      "required_privilege": "REQUIRES_SHIZUKU",
+      "detection_method": "GameManager API + Shizuku `cmd game mode` probe",
+      "fallback_when_unsupported": "ADPF HintSession + Background Memory Trim"
+    },
+    {
+      "id": "cpufreq_sysfs",
+      "name": "Linux Kernel CPUFreq Policy Control",
+      "layer": "Kernel sysfs (/sys/devices/system/cpu/cpufreq)",
+      "required_privilege": "REQUIRES_ROOT",
+      "detection_method": "Dynamic scan of policy0..policyN read/write permissions",
+      "fallback_when_unsupported": "Read-only telemetry + Shizuku fixed-performance-mode"
+    },
+    {
+      "id": "gpu_devfreq_sysfs",
+      "name": "Linux Kernel GPU Devfreq Control",
+      "layer": "Kernel sysfs (/sys/class/devfreq)",
+      "required_privilege": "REQUIRES_ROOT",
+      "detection_method": "Dynamic enumeration of /sys/class/devfreq/* and kgsl-3d0",
+      "fallback_when_unsupported": "GameManager GPU scaling intervention via Shizuku"
+    }
+  ]
+}
